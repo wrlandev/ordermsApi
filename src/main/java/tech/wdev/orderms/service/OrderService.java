@@ -1,6 +1,9 @@
 package tech.wdev.orderms.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import tech.wdev.orderms.controller.dto.OrderResponse;
 import tech.wdev.orderms.entity.OrderEntity;
 import tech.wdev.orderms.entity.OrderItem;
 import tech.wdev.orderms.listener.dto.OrderCreatedEvent;
@@ -28,6 +31,12 @@ public class OrderService {
         entity.setTotal(getTotal(event));
 
         orderRepository.save(entity);
+    }
+
+    public Page<OrderResponse> findAllByCustomerId(Long customerId, PageRequest pageRequest) {
+        var orders = orderRepository.findAllByCustomerId(customerId, pageRequest);
+
+        return orders.map(OrderResponse::fromEntity);
     }
 
     private BigDecimal getTotal(OrderCreatedEvent event) {
