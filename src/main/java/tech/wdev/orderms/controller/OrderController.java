@@ -11,6 +11,8 @@ import tech.wdev.orderms.controller.dto.OrderResponse;
 import tech.wdev.orderms.controller.dto.PaginationResponse;
 import tech.wdev.orderms.service.OrderService;
 
+import java.util.Map;
+
 @RestController
 public class OrderController {
 
@@ -21,14 +23,15 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/customers/{customersId}/orders")
+    @GetMapping("/customers/{customerId}/orders")
     public ResponseEntity<ApiResponse<OrderResponse>> listOders(@PathVariable("customerId") Long customerId,
                                                                 @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize){
 
         var pageResponse = orderService.findAllByCustomerId(customerId, PageRequest.of(page, pageSize));
-
+        var totalOrders = orderService.getTotalByCustomerId(customerId);
         return ResponseEntity.ok(new ApiResponse<>(
+                Map.of("totalOrders", totalOrders),
                 pageResponse.getContent(),
                 PaginationResponse.fromPage(pageResponse)
         ));
